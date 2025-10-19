@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer-core');
-const chromium = require('@sparticuz/chromium');
+const chromium = require('@sparticuz/chromium-min');
 
 exports.handler = async (event, context) => {
   const { url, waitfor } = event.queryStringParameters || {};
