@@ -18,6 +18,7 @@ exports.handler = async (event, context) => {
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless,
+      ignoreHTTPSErrors: true,
     });
     const page = await browser.newPage();
 
@@ -73,7 +74,7 @@ exports.handler = async (event, context) => {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' }),
+      body: JSON.stringify({ error: error.message }),
     };
   } finally {
     if (browser) {
