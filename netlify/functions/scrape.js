@@ -14,7 +14,7 @@ exports.handler = async (event, context) => {
   let browser;
   try {
     browser = await puppeteer.launch({
-      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless,
@@ -49,11 +49,11 @@ exports.handler = async (event, context) => {
     });
 
     // Navigate to the URL
-    await page.goto(url, { waitUntil: 'networkidle0' });
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
 
     // Wait for the response to be found, with a timeout
     let attempts = 0;
-    const maxAttempts = 50; // About 5 seconds at 100ms intervals
+    const maxAttempts = 100; // About 10 seconds at 100ms intervals
     while (!foundResponse && attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 100));
       attempts++;
@@ -71,10 +71,10 @@ exports.handler = async (event, context) => {
       body: JSON.stringify(foundResponse),
     };
   } catch (error) {
-    console.error(error);
+    console.error('Error details:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ error: error.message || 'Internal server error' }),
     };
   } finally {
     if (browser) {
